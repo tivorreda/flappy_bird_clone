@@ -11,9 +11,9 @@ public class InputManager : MonoBehaviour
 
     private float lastTimePressed = 0f;
 
-    public Action<Vector2> OnPointerPressed;
-    public Action<Vector2> OnPointerHold;
-    public Action<Vector2, float> OnPointerUp;
+    private Action<Vector2> OnPointerPressed;
+    private Action<Vector2> OnPointerHold;
+    private Action<Vector2, float> OnPointerUp;
 
     void Awake()
     {
