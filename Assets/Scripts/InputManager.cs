@@ -23,7 +23,7 @@ public class InputManager : MonoBehaviour
 #endif
 #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
         checkInputAction = CheckMouseInput;
-        #endif
+#endif  
     }
 
     // Update is called once per frame
