@@ -10,11 +10,10 @@ public class InputManager : MonoBehaviour
     private Vector2 currentPointerPos = Vector2.zero;
 
     private float lastTimePressed = 0f;
-    private bool isTouch = false;
 
-    public UnityEvent<Vector2> OnPointerPressed;
-    public UnityEvent<Vector2> OnPointerHold;
-    public UnityEvent<Vector2, float> OnPointerUp;
+    public Action<Vector2> OnPointerPressed;
+    public Action<Vector2> OnPointerHold;
+    public Action<Vector2, float> OnPointerUp;
 
     void Awake()
     {
@@ -71,20 +70,27 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    public void AddListener(IInputListener inputListener)
+    {
+        OnPointerHold += inputListener.OnHold;
+        OnPointerPressed += inputListener.OnPressed;
+        OnPointerUp += inputListener.OnReleased;
+    }
+
     private void PointerPress()
     {
         lastTimePressed = Time.time;
-        OnPointerPressed.Invoke(currentPointerPos);
+        OnPointerPressed?.Invoke(currentPointerPos);
     }
 
     private void PointerRelease()
     {
         float holdTime = Time.time - lastTimePressed;
-        OnPointerUp.Invoke(currentPointerPos, holdTime);
+        OnPointerUp?.Invoke(currentPointerPos, holdTime);
     }
 
     private void PointerHold()
     {
-        OnPointerHold.Invoke(currentPointerPos);
+        OnPointerHold?.Invoke(currentPointerPos);
     }
 }
