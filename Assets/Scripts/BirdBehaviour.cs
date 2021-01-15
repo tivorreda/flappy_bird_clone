@@ -1,34 +1,40 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
-public class BirdBehaviour : MonoBehaviour, IInputListener
+public class BirdBehaviour : MonoBehaviour, IDamageable
 {
     private const float gravity = 10f;
     private const float flapImpulse = 6f;
 
-    private Vector3 velocity = Vector3.zero;
     private CharacterController charController;
 
-    [SerializeField]
-    private InputManager inputManager;
-   
+    private Vector3 velocity = Vector3.zero;
+    private Vector3 startPosition;
+
+    private bool shouldMove;
+
+    public event Action OnReceiveDamage;
+
     // Start is called before the first frame update
     void Start()
     {
+        startPosition = transform.position;
         charController = GetComponent<CharacterController>();
-        if (inputManager != null)
-        {
-            inputManager.AddListener(this);
-        }
+
+        InputManager.Instance.OnPointerUp += OnReleased;
     }
 
     // Update is called once per frame
     void Update()
     {
-        ApplyGravity();
-        charController.Move(velocity * Time.deltaTime);
+        if (shouldMove)
+        {
+            ApplyGravity();
+            charController.Move(velocity * Time.deltaTime);
+        }
     }
 
     private void ApplyGravity()
@@ -38,12 +44,16 @@ public class BirdBehaviour : MonoBehaviour, IInputListener
 
     private void ApplyTapImpulse()
     {
-        velocity = Vector3.up * flapImpulse;
+        if (shouldMove)
+        {
+            velocity = Vector3.up * flapImpulse;
+        }
     }
 
-    public void OnPressed(Vector2 pointerPos)
+    public void DoDamage(float damage)
     {
-        //TODO
+        shouldMove = false;
+        OnReceiveDamage?.Invoke();
     }
 
     public void OnReleased(Vector2 pointerPos, float pressedTime)
@@ -51,8 +61,15 @@ public class BirdBehaviour : MonoBehaviour, IInputListener
         ApplyTapImpulse();
     }
 
-    public void OnHold(Vector2 pointerPos)
+    public void OnPauseListened(bool isPaused)
     {
-        //TODO
+        shouldMove = !isPaused;
+    }
+
+    public void OnResetListened()
+    {
+        shouldMove = false;
+        transform.position = startPosition;
+        velocity = Vector3.zero;
     }
 }

@@ -6,17 +6,41 @@ using UnityEngine.Events;
 
 public class InputManager : MonoBehaviour
 {
+    private static InputManager instance;
+
+    public static InputManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                GameObject gameControllerObject = new GameObject("InputManager");
+                instance = gameControllerObject.AddComponent<InputManager>();
+            }
+            return instance;
+        }
+    }
+
     private Action checkInputAction;
+
     private Vector2 currentPointerPos = Vector2.zero;
+    private Vector2 lastFramePos = Vector2.zero;
 
     private float lastTimePressed = 0f;
 
-    private Action<Vector2> OnPointerPressed;
-    private Action<Vector2> OnPointerHold;
-    private Action<Vector2, float> OnPointerUp;
+    public Action<Vector2> OnPointerPressed;
+    public Action<Vector2> OnPointerHold;
+    public Action<Vector2, Vector2> OnPointerMoved;
+    public Action<Vector2, float> OnPointerUp;
 
     void Awake()
     {
+        if (instance == null)
+            instance = this;
+
+        if (instance != this)
+            Destroy(this.gameObject);
+
 #if UNITY_ANDROID || UNITY_IOS
         checkInputAction = CheckTouchInput;
 #endif
@@ -43,6 +67,8 @@ public class InputManager : MonoBehaviour
                     PointerPress();
                     break;
                 case TouchPhase.Stationary:
+                    PointerMoved();
+                    break;
                 case TouchPhase.Moved:
                     PointerHold();
                     break;
@@ -50,6 +76,7 @@ public class InputManager : MonoBehaviour
                     PointerRelease();
                     break;
             }
+            lastFramePos = touch.position;
         }
     }
 
@@ -62,19 +89,20 @@ public class InputManager : MonoBehaviour
         }
         else if (Input.GetMouseButton(0))
         {
-            PointerHold();
+            if (Vector2.Distance(currentPointerPos, lastFramePos) > 0f)
+            {
+                PointerHold();
+            }
+            else
+            {
+                PointerMoved();
+            }
         }
         else if (Input.GetMouseButtonUp(0))
         {
             PointerRelease();
         }
-    }
-
-    public void AddListener(IInputListener inputListener)
-    {
-        OnPointerHold += inputListener.OnHold;
-        OnPointerPressed += inputListener.OnPressed;
-        OnPointerUp += inputListener.OnReleased;
+        lastFramePos = Input.mousePosition;
     }
 
     private void PointerPress()
@@ -92,5 +120,10 @@ public class InputManager : MonoBehaviour
     private void PointerHold()
     {
         OnPointerHold?.Invoke(currentPointerPos);
+    }
+
+    private void PointerMoved()
+    {
+        OnPointerMoved?.Invoke(lastFramePos, currentPointerPos);
     }
 }
