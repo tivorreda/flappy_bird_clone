@@ -16,6 +16,8 @@ public class BirdBehaviour : MonoBehaviour, IDamageable
 
     private bool shouldMove;
 
+    private InputManager inputManager = new InputManager();
+
     public event Action OnReceiveDamage;
 
     // Start is called before the first frame update
@@ -24,12 +26,13 @@ public class BirdBehaviour : MonoBehaviour, IDamageable
         startPosition = transform.position;
         charController = GetComponent<CharacterController>();
 
-        InputManager.Instance.OnPointerUp += OnReleased;
+        inputManager.OnPointerUp += OnReleased;
     }
 
     // Update is called once per frame
     void Update()
     {
+        inputManager.CheckInput();
         if (shouldMove)
         {
             ApplyGravity();

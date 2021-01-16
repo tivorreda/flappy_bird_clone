@@ -4,24 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class InputManager : MonoBehaviour
+public class InputManager
 {
-    private static InputManager instance;
-
-    public static InputManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                GameObject gameControllerObject = new GameObject("InputManager");
-                instance = gameControllerObject.AddComponent<InputManager>();
-            }
-            return instance;
-        }
-    }
-
-    private Action checkInputAction;
+    private static Action checkInputAction;
 
     private Vector2 currentPointerPos = Vector2.zero;
     private Vector2 lastFramePos = Vector2.zero;
@@ -33,26 +18,19 @@ public class InputManager : MonoBehaviour
     public Action<Vector2, Vector2> OnPointerMoved;
     public Action<Vector2, float> OnPointerUp;
 
-    void Awake()
+    public InputManager()
     {
-        if (instance == null)
-            instance = this;
-
-        if (instance != this)
-            Destroy(this.gameObject);
-
-#if UNITY_ANDROID || UNITY_IOS
-        checkInputAction = CheckTouchInput;
-#endif
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
-        checkInputAction = CheckMouseInput;
-#endif  
+        #if UNITY_ANDROID || UNITY_IOS
+            checkInputAction = CheckTouchInput;
+        #endif
+        #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
+            checkInputAction = CheckMouseInput;
+        #endif  
     }
 
-    // Update is called once per frame
-    void Update()
+    public void CheckInput()
     {
-        checkInputAction.Invoke();
+        checkInputAction?.Invoke();
     }
 
     public void CheckTouchInput()
