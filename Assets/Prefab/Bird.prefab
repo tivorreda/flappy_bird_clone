@@ -63,6 +63,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e3b72aed2f197346aa69195d1b531d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isBirdDead: {fileID: 11400000, guid: 4635e10e0cdeeb74d91145e3668ee69e, type: 2}
+  isGamePaused: {fileID: 11400000, guid: 89c36b1c8b308fc45859ff3f7ac6b7c6, type: 2}
+  viewHolderObject: {fileID: 1537029710585831707}
 --- !u!1 &1537029710585831707
 GameObject:
   m_ObjectHideFlags: 0

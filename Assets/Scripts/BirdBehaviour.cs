@@ -7,7 +7,8 @@ using UnityEngine;
 public class BirdBehaviour : MonoBehaviour, IDamageable
 {
     private const float gravity = 10f;
-    private const float flapImpulse = 6f;
+    private const float flapImpulse = 5f;
+    private const float gravityModifier = 1.7f;
 
     private CharacterController charController;
 
@@ -16,6 +17,8 @@ public class BirdBehaviour : MonoBehaviour, IDamageable
 
     [SerializeField] private BooleanValueData isBirdDead;
     [SerializeField] private BooleanValueData isGamePaused;
+
+    [SerializeField] private GameObject viewHolderObject;
 
     private bool shouldMove;
 
@@ -45,7 +48,9 @@ public class BirdBehaviour : MonoBehaviour, IDamageable
 
     private void ApplyGravity()
     {
-        velocity -= Vector3.up * gravity * Time.deltaTime;
+        // A trick for better gameplay, gravity is raised while bird is falling
+        float gravityToApply = velocity.y < 0 ? gravity * gravityModifier : gravity;
+        velocity -= Vector3.up * gravityToApply * Time.deltaTime;
     }
 
     private void ApplyTapImpulse()
@@ -56,10 +61,11 @@ public class BirdBehaviour : MonoBehaviour, IDamageable
         }
     }
 
-    public void DoDamage(float damage)
+    public void DoDamage()
     {
         shouldMove = false;
         isBirdDead.value = true;
+        viewHolderObject.SetActive(false);
     }
 
     public void OnReleased(Vector2 pointerPos, float pressedTime)
@@ -79,6 +85,7 @@ public class BirdBehaviour : MonoBehaviour, IDamageable
             shouldMove = false;
             transform.position = startPosition;
             velocity = Vector3.zero;
+            viewHolderObject.SetActive(true);
         }
     }
 }

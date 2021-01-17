@@ -5,5 +5,5 @@ using UnityEngine;
 
 public interface IDamageable
 {
-    void DoDamage(float damage);
+    void DoDamage();
 }
