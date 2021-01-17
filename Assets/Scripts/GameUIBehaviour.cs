@@ -9,19 +9,13 @@ public class GameUIBehaviour : MonoBehaviour
     [SerializeField] private TextMeshProUGUI deadText;
     [SerializeField] private TextMeshProUGUI pauseText;
 
+    [SerializeField] private BooleanValueData isBirdDead;
+    [SerializeField] private BooleanValueData isGamePaused;
+
     private void Start()
     {
-        GameController.Instance.OnResetHandler += OnResetListener;
-        GameController.Instance.OnPauseHandler += OnPauseListener;
-        GameController.Instance.OnBirdDeathHandler += OnBirdDeathListener;
-    }
-
-    private void OnPauseListener(bool isPaused)
-    {
-        if (!deadText.gameObject.activeInHierarchy || pauseText.gameObject.activeInHierarchy)
-        {
-            pauseText.gameObject.SetActive(isPaused);
-        }
+        isBirdDead.AddOnValueChangeListener(OnIsBirdDeadValueChangedListener);
+        isGamePaused.AddOnValueChangeListener(OnIsGamePausedChangedListener);
     }
 
     private void OnBirdDeathListener()
@@ -29,9 +23,15 @@ public class GameUIBehaviour : MonoBehaviour
         deadText.gameObject.SetActive(true);
     }
 
-    private void OnResetListener()
+    private void OnIsBirdDeadValueChangedListener(bool value)
     {
-        deadText.gameObject.SetActive(false);
-        pauseText.gameObject.SetActive(true);
+        deadText.gameObject.SetActive(value);
+        if (!value)
+            pauseText.gameObject.SetActive(true);
+    }
+
+    private void OnIsGamePausedChangedListener(bool value)
+    {
+        pauseText.gameObject.SetActive(value);
     }
 }

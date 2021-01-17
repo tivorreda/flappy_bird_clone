@@ -20,12 +20,12 @@ public class InputManager
 
     public InputManager()
     {
-        #if UNITY_ANDROID || UNITY_IOS
+#if (UNITY_ANDROID || UNITY_IOS) && !(UNITY_EDITOR_WIN || UNITY_EDITOR_OSX)
             checkInputAction = CheckTouchInput;
+#endif
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
+        checkInputAction = CheckMouseInput;
         #endif
-        #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR_WIN || UNITY_EDITOR_OSX
-            checkInputAction = CheckMouseInput;
-        #endif  
     }
 
     public void CheckInput()

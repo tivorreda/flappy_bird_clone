@@ -20,29 +20,11 @@ public class GameController : MonoBehaviour
         }
     }
 
-    [SerializeField] private GameObject birdObjectPrefab;
-
-    private bool isGamePaused;
-    private bool isBirdDead;
-
-    private event Action<bool> _OnPauseHandler;
-    public event Action<bool> OnPauseHandler
-    {
-        add
-        {
-            _OnPauseHandler += value;
-            value?.Invoke(isGamePaused);
-        }
-
-        remove
-        {
-            _OnPauseHandler -= value;
-        }
-    }
+    [SerializeField] private BooleanValueData isBirdDead;
+    [SerializeField] private BooleanValueData isGamePaused;
 
     public event Action OnResetHandler;
-    public event Action OnBirdDeathHandler;
-
+   
     // Start is called before the first frame update
     void Awake()
     {
@@ -52,10 +34,8 @@ public class GameController : MonoBehaviour
         if (instance != this)
             Destroy(this.gameObject);
 
-        isGamePaused = true;
-        isBirdDead = false;
-
-        InitBird();
+        isBirdDead.value = false;
+        isGamePaused.value = true;
     }
 
     private void Update()
@@ -72,8 +52,8 @@ public class GameController : MonoBehaviour
         // PLACEHOLDER BEHAVIOUR
         if (Input.GetKeyDown(KeyCode.R))
         {
-            isBirdDead = false;
-            isGamePaused = true;
+            isBirdDead.value = false;
+            isGamePaused.value = true;
             OnResetHandler?.Invoke();
         }
 
@@ -84,29 +64,13 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void InitBird()
-    {
-        BirdBehaviour bird = Instantiate(birdObjectPrefab, Vector3.zero, Quaternion.Euler(Vector3.zero), null).GetComponent<BirdBehaviour>();
-        OnPauseHandler += bird.OnPauseListened;
-        OnResetHandler += bird.OnResetListened;
-        bird.OnReceiveDamage += OnBirdDeath;
-    }
-
     public void PauseGame()
     {
-        isGamePaused = true;
-        _OnPauseHandler?.Invoke(isGamePaused);
+        isGamePaused.value = true;
     }
 
     public void UnpauseGame()
     {
-        isGamePaused = false;
-        _OnPauseHandler?.Invoke(isGamePaused);
-    }
-
-    public void OnBirdDeath()
-    {
-        isBirdDead = true;
-        OnBirdDeathHandler?.Invoke();
+        isGamePaused.value = false;
     }
 }

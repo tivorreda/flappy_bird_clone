@@ -14,11 +14,12 @@ public class BirdBehaviour : MonoBehaviour, IDamageable
     private Vector3 velocity = Vector3.zero;
     private Vector3 startPosition;
 
+    [SerializeField] private BooleanValueData isBirdDead;
+    [SerializeField] private BooleanValueData isGamePaused;
+
     private bool shouldMove;
 
     private InputManager inputManager = new InputManager();
-
-    public event Action OnReceiveDamage;
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +28,8 @@ public class BirdBehaviour : MonoBehaviour, IDamageable
         charController = GetComponent<CharacterController>();
 
         inputManager.OnPointerUp += OnReleased;
+        isGamePaused.AddOnValueChangeListener(OnPauseListened);
+        isBirdDead.AddOnValueChangeListener(OnBirdDeadValueChangeListener);
     }
 
     // Update is called once per frame
@@ -56,7 +59,7 @@ public class BirdBehaviour : MonoBehaviour, IDamageable
     public void DoDamage(float damage)
     {
         shouldMove = false;
-        OnReceiveDamage?.Invoke();
+        isBirdDead.value = true;
     }
 
     public void OnReleased(Vector2 pointerPos, float pressedTime)
@@ -69,10 +72,13 @@ public class BirdBehaviour : MonoBehaviour, IDamageable
         shouldMove = !isPaused;
     }
 
-    public void OnResetListened()
+    public void OnBirdDeadValueChangeListener(bool value)
     {
-        shouldMove = false;
-        transform.position = startPosition;
-        velocity = Vector3.zero;
+        if (!value)
+        {
+            shouldMove = false;
+            transform.position = startPosition;
+            velocity = Vector3.zero;
+        }
     }
 }
